@@ -5,7 +5,6 @@ import { Loading, Empty, Notice } from '../../components/ui.jsx';
 import { useToast } from '../../components/Toast.jsx';
 import { creatureMeta, STAGE_LABEL } from '../../constants/meta.js';
 import { api } from '../../api.js';
-import { useAuth } from '../../auth.jsx';
 
 function hhmm(iso) {
   const d = new Date(iso);
@@ -15,7 +14,6 @@ function hhmm(iso) {
 export default function ParentDashboard() {
   const navigate = useNavigate();
   const toast = useToast();
-  const { parent, logoutParent } = useAuth();
 
   const [children, setChildren] = useState(null);
   const [pending, setPending] = useState([]);
@@ -80,16 +78,10 @@ export default function ParentDashboard() {
     <PhoneFrame>
       <TopBar
         title="👨‍👩‍👧 家长控制台"
-        subtitle={parent?.phone ? `手机号 ${parent.phone.slice(0, 3)}****${parent.phone.slice(-4)}` : ''}
+        subtitle="本地账号 · 无需登录"
         action={
-          <button
-            className="topbar__action"
-            onClick={() => {
-              logoutParent();
-              navigate('/');
-            }}
-          >
-            退出
+          <button className="topbar__action" onClick={() => navigate('/')}>
+            返回首页
           </button>
         }
       />

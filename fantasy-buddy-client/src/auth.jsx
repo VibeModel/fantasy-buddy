@@ -3,19 +3,12 @@ import { session } from './api';
 
 const AuthContext = createContext(null);
 
+/**
+ * 本地单机版：只有儿童端需要登录（设备码）；
+ * 家长端无需注册/登录，直接可用，因此不在此维护家长登录态。
+ */
 export function AuthProvider({ children }) {
-  const [parent, setParentState] = useState(session.getParent());
   const [child, setChildState] = useState(session.getChild());
-
-  const loginParent = useCallback((parentInfo, token) => {
-    session.setParent(parentInfo, token);
-    setParentState(parentInfo);
-  }, []);
-
-  const logoutParent = useCallback(() => {
-    session.clearParent();
-    setParentState(null);
-  }, []);
 
   const loginChild = useCallback((childInfo, token) => {
     session.setChild(childInfo, token);
@@ -27,10 +20,7 @@ export function AuthProvider({ children }) {
     setChildState(null);
   }, []);
 
-  const value = useMemo(
-    () => ({ parent, child, loginParent, logoutParent, loginChild, logoutChild }),
-    [parent, child, loginParent, logoutParent, loginChild, logoutChild]
-  );
+  const value = useMemo(() => ({ child, loginChild, logoutChild }), [child, loginChild, logoutChild]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

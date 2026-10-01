@@ -15,11 +15,11 @@ const {
   Notification,
   db
 } = require('../models/database');
-const { authenticateParent } = require('../middleware/auth');
+const { attachLocalParent } = require('../middleware/auth');
 const { findTemplate, CATEGORY_LABELS } = require('../constants/taskTemplates');
 
 const router = express.Router();
-router.use(authenticateParent);
+router.use(attachLocalParent);
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 

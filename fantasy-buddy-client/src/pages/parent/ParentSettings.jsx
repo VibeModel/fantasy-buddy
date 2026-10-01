@@ -4,12 +4,10 @@ import { PhoneFrame, TopBar, BottomNav } from '../../components/Layout.jsx';
 import { Loading, Notice } from '../../components/ui.jsx';
 import { useToast } from '../../components/Toast.jsx';
 import { api } from '../../api.js';
-import { useAuth } from '../../auth.jsx';
 
 export default function ParentSettings() {
   const navigate = useNavigate();
   const toast = useToast();
-  const { parent, logoutParent } = useAuth();
 
   const [children, setChildren] = useState(null);
   const [settings, setSettings] = useState(null);
@@ -81,15 +79,9 @@ export default function ParentSettings() {
       <div className="screen screen--with-nav">
         <div className="card">
           <strong>👤 账号信息</strong>
-          <div className="muted mt-8">手机号：{parent?.phone || '-'}</div>
-          <button
-            className="btn btn--danger btn--block mt-12"
-            onClick={() => {
-              logoutParent();
-              navigate('/');
-            }}
-          >
-            退出登录
+          <div className="muted mt-8">本地账号（无需注册 / 登录）</div>
+          <button className="btn btn--ghost btn--block mt-12" onClick={() => navigate('/')}>
+            返回首页
           </button>
         </div>
 

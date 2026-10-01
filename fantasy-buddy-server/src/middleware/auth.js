@@ -2,7 +2,7 @@
  * 认证中间件
  */
 
-const { db } = require('../models/database');
+const { db, Parent } = require('../models/database');
 
 /**
  * 解析并验证Token
@@ -73,10 +73,16 @@ function authenticateChild(req, res, next) {
 
 /**
  * 家长端认证
+ * 本地单机版：无需登录，直接绑定到唯一的本地家长账号
  */
-function authenticateParent(req, res, next) {
-  req.headers['x-app-type'] = 'parent';
-  authenticate(req, res, next);
+function attachLocalParent(req, res, next) {
+  try {
+    const parent = Parent.ensureLocalParent();
+    req.user = { id: parent.parent_id, type: 'parent' };
+    next();
+  } catch (err) {
+    next(err);
+  }
 }
 
 /**
@@ -104,6 +110,6 @@ function generateToken(userId, type, parentId = null, childId = null) {
 module.exports = {
   authenticate,
   authenticateChild,
-  authenticateParent,
+  attachLocalParent,
   generateToken
 };

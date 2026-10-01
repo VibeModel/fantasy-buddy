@@ -10,7 +10,6 @@ import RewardClaim from './pages/child/RewardClaim.jsx';
 import Inventory from './pages/child/Inventory.jsx';
 import CreatureDetail from './pages/child/CreatureDetail.jsx';
 
-import ParentLogin from './pages/parent/ParentLogin.jsx';
 import ParentDashboard from './pages/parent/ParentDashboard.jsx';
 import ParentVerify from './pages/parent/ParentVerify.jsx';
 import ParentAddTask from './pages/parent/ParentAddTask.jsx';
@@ -24,18 +23,12 @@ function RequireChild({ children }) {
   return children;
 }
 
-function RequireParent({ children }) {
-  const { parent } = useAuth();
-  const location = useLocation();
-  if (!parent) return <Navigate to="/parent/login" replace state={{ from: location.pathname }} />;
-  return children;
-}
-
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
 
+      {/* 儿童端：设备码登录 */}
       <Route path="/child/login" element={<ChildLogin />} />
       <Route
         path="/child"
@@ -86,47 +79,12 @@ export default function App() {
         }
       />
 
-      <Route path="/parent/login" element={<ParentLogin />} />
-      <Route
-        path="/parent"
-        element={
-          <RequireParent>
-            <ParentDashboard />
-          </RequireParent>
-        }
-      />
-      <Route
-        path="/parent/verify/:taskId"
-        element={
-          <RequireParent>
-            <ParentVerify />
-          </RequireParent>
-        }
-      />
-      <Route
-        path="/parent/tasks/new"
-        element={
-          <RequireParent>
-            <ParentAddTask />
-          </RequireParent>
-        }
-      />
-      <Route
-        path="/parent/report"
-        element={
-          <RequireParent>
-            <ParentReport />
-          </RequireParent>
-        }
-      />
-      <Route
-        path="/parent/settings"
-        element={
-          <RequireParent>
-            <ParentSettings />
-          </RequireParent>
-        }
-      />
+      {/* 家长端：本地单机版，无需登录 */}
+      <Route path="/parent" element={<ParentDashboard />} />
+      <Route path="/parent/verify/:taskId" element={<ParentVerify />} />
+      <Route path="/parent/tasks/new" element={<ParentAddTask />} />
+      <Route path="/parent/report" element={<ParentReport />} />
+      <Route path="/parent/settings" element={<ParentSettings />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

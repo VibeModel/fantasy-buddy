@@ -6,8 +6,6 @@
 const BASE = '/v1';
 
 const KEY = {
-  parentToken: 'fb_parent_token',
-  parentInfo: 'fb_parent_info',
   childToken: 'fb_child_token',
   childInfo: 'fb_child_info'
 };
@@ -27,21 +25,11 @@ function write(key, value) {
 }
 
 export const session = {
-  getParentToken: () => localStorage.getItem(KEY.parentToken),
-  getParent: () => read(KEY.parentInfo),
-  setParent: (parent, token) => {
-    write(KEY.parentInfo, parent || null);
-    if (token) localStorage.setItem(KEY.parentToken, token);
-  },
   getChildToken: () => localStorage.getItem(KEY.childToken),
   getChild: () => read(KEY.childInfo),
   setChild: (child, token) => {
     write(KEY.childInfo, child || null);
     if (token) localStorage.setItem(KEY.childToken, token);
-  },
-  clearParent: () => {
-    localStorage.removeItem(KEY.parentToken);
-    localStorage.removeItem(KEY.parentInfo);
   },
   clearChild: () => {
     localStorage.removeItem(KEY.childToken);
@@ -53,8 +41,7 @@ async function request(method, path, { body, role } = {}) {
   const headers = { 'Content-Type': 'application/json' };
 
   if (role === 'parent') {
-    const token = session.getParentToken();
-    if (token) headers.Authorization = `Bearer ${token}`;
+    // 本地单机版：家长端无需 Token
     headers['X-App-Type'] = 'parent';
   } else if (role === 'child') {
     const token = session.getChildToken();
@@ -94,10 +81,6 @@ async function request(method, path, { body, role } = {}) {
 
 export const api = {
   // ---------- 通用 ----------
-  register: (phone, password) =>
-    request('POST', '/common/auth/register', { body: { phone, password } }),
-  login: (phone, password) =>
-    request('POST', '/common/auth/login', { body: { phone, password } }),
   childLogin: (device_code) =>
     request('POST', '/common/auth/child-login', { body: { device_code } }),
   bindChild: (body) =>

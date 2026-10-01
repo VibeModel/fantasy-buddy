@@ -2,17 +2,15 @@
  * 通用 API 路由 (/v1/common)
  * 基于 DESIGN_DOCUMENT.md 7.3 通用 API
  *
- * - 家长注册 / 登录
  * - 儿童设备码登录
- * - 家长绑定孩子账号
+ * - 家长绑定孩子账号（本地单机版，无需家长登录）
  * - 任务模板列表
  */
 
 const express = require('express');
-const bcrypt = require('bcryptjs');
 
 const { Parent, Child, Creature } = require('../models/database');
-const { generateToken, authenticateParent } = require('../middleware/auth');
+const { generateToken, attachLocalParent } = require('../middleware/auth');
 const { TASK_TEMPLATES } = require('../constants/taskTemplates');
 
 const router = express.Router();
@@ -35,40 +33,6 @@ function fail(res, httpStatus, code, message) {
     timestamp: Date.now()
   });
 }
-
-/**
- * 家长注册
- * POST /v1/common/auth/register
- */
-router.post('/auth/register', async (req, res) => {
-  const { phone, password } = req.body || {};
-  if (!phone || !password) return fail(res, 400, 1001, '手机号和密码不能为空');
-  if (Parent.findByPhone(phone)) return fail(res, 400, 1001, '该手机号已注册');
-
-  const password_hash = await bcrypt.hash(password, 10);
-  const parent = Parent.create({ phone, password_hash });
-  const access_token = generateToken(parent.parent_id, 'parent', parent.parent_id);
-
-  return success(res, { parent_id: parent.parent_id, access_token }, '注册成功');
-});
-
-/**
- * 家长登录
- * POST /v1/common/auth/login
- */
-router.post('/auth/login', async (req, res) => {
-  const { phone, password } = req.body || {};
-  if (!phone || !password) return fail(res, 400, 1001, '手机号和密码不能为空');
-
-  const parent = Parent.findByPhone(phone);
-  if (!parent) return fail(res, 401, 1002, '手机号或密码错误');
-
-  const ok = await bcrypt.compare(password, parent.password_hash);
-  if (!ok) return fail(res, 401, 1002, '手机号或密码错误');
-
-  const access_token = generateToken(parent.parent_id, 'parent', parent.parent_id);
-  return success(res, { access_token, parent_id: parent.parent_id }, '登录成功');
-});
 
 /**
  * 儿童登录（设备码登录）
@@ -95,9 +59,9 @@ router.post('/auth/child-login', (req, res) => {
 /**
  * 绑定孩子账号
  * POST /v1/common/parent/bind-child
- * Header: Authorization: Bearer <parent_token>
+ * 本地单机版：无需家长 Token
  */
-router.post('/parent/bind-child', authenticateParent, (req, res) => {
+router.post('/parent/bind-child', attachLocalParent, (req, res) => {
   const parentId = req.user.id;
   const { child_nickname, parent_verification_code } = req.body || {};
 

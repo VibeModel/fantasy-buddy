@@ -57,6 +57,19 @@ const Parent = {
   },
 
   /**
+   * 获取（或创建）本地家长账号
+   * 本地单机版：家长端无需注册/登录，全应用共用一个家长账号
+   */
+  ensureLocalParent() {
+    const LOCAL_PHONE = '__local__';
+    let parent = this.findByPhone(LOCAL_PHONE);
+    if (!parent) {
+      parent = this.create({ phone: LOCAL_PHONE, password_hash: '' });
+    }
+    return parent;
+  },
+
+  /**
    * 绑定孩子账号
    */
   bindChild(parentId, childId) {

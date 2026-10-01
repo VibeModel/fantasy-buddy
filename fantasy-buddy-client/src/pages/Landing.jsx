@@ -4,7 +4,7 @@ import { useAuth } from '../auth.jsx';
 
 export default function Landing() {
   const navigate = useNavigate();
-  const { parent, child } = useAuth();
+  const { child } = useAuth();
 
   return (
     <PhoneFrame>
@@ -24,7 +24,7 @@ export default function Landing() {
         <button
           className="btn btn--secondary btn--block mt-12"
           style={{ maxWidth: 300 }}
-          onClick={() => navigate(parent ? '/parent' : '/parent/login')}
+          onClick={() => navigate('/parent')}
         >
           👨 我是爸爸妈妈
         </button>
