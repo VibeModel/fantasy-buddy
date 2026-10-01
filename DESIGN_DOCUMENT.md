@@ -316,8 +316,12 @@
 
 ### 5.3 认证方式
 ```
-Header: Authorization: Bearer <access_token>
-       X-App-Type: child | parent
+# 儿童端：设备码登录后携带 Token
+Header: Authorization: Bearer <child_token>
+       X-App-Type: child
+
+# 家长端：本地单机版，无需注册/登录，/parent/* 直接可用
+Header: X-App-Type: parent
 ```
 
 ### 5.4 统一响应格式
@@ -350,12 +354,15 @@ Header: Authorization: Bearer <access_token>
 ## 6. 数据模型设计
 
 ### 6.1 家长账号 (Parent)
+
+> 本地单机版：全应用只有一个家长账号，首次访问时自动创建，**无需注册/登录**。
+
 ```json
 {
   "parent_id": "uuid-string",
-  "phone": "string",
+  "phone": "__local__",                 // 本地单机版固定标记
   "email": "string (optional)",
-  "password_hash": "string",
+  "password_hash": "string",            // 本地单机版未使用
   "approval_pin_hash": "string | null",  // 家长自设的 6 位审批密码（bcrypt 哈希，仅 pin 模式使用）
   "children_ids": ["array of child_user_ids"],
   "settings": {
@@ -778,7 +785,7 @@ Response:
 #### 7.2.2 审批任务完成（家长操作）
 ```
 POST /parent/tasks/{task_id}/verify
-Header: Authorization: Bearer <parent_token>
+// 本地单机版：家长端无需 Token
 
 // 审批方式由家长的 verify_mode 决定：
 //   strict → 必须携带任务验证码 code（孩子端显示、10 分钟有效）
@@ -972,32 +979,9 @@ Response:
 
 ### 7.3 通用 API (Common)
 
-#### 7.3.1 家长注册/登录
-```
-POST /common/auth/register
-Request:
-{
-  "phone": "13800138000",
-  "password": "xxxxxx"
-}
+> 家长端相关接口（`/parent/*`、`/common/parent/*`）在本地单机版下**无需鉴权**。
 
-POST /common/auth/login
-Request:
-{
-  "phone": "13800138000",
-  "password": "xxxxxx"
-}
-Response:
-{
-  "success": true,
-  "data": {
-    "access_token": "jwt-token",
-    "parent_id": "uuid"
-  }
-}
-```
-
-#### 7.3.2 儿童登录（设备码）
+#### 7.3.1 儿童登录（设备码）
 ```
 POST /common/auth/child-login
 Request:
@@ -1014,10 +998,10 @@ Response:
 }
 ```
 
-#### 7.3.3 绑定孩子账号
+#### 7.3.2 绑定孩子账号
 ```
 POST /common/parent/bind-child
-Header: Authorization: Bearer <parent_token>
+// 本地单机版：无需家长 Token
 Request:
 {
   "child_nickname": "小明",                          // 新建孩子时必填
@@ -1036,7 +1020,7 @@ Response:
 }
 ```
 
-#### 7.3.4 获取任务模板列表（供家长选择）
+#### 7.3.3 获取任务模板列表（供家长选择）
 ```
 GET /common/task-templates
 Query: ?category=study
