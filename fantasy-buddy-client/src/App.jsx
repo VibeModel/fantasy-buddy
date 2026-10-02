@@ -6,6 +6,7 @@ import ChildLogin from './pages/child/ChildLogin.jsx';
 import ChildSetup from './pages/child/ChildSetup.jsx';
 import ChildHome from './pages/child/ChildHome.jsx';
 import ChildTasks from './pages/child/ChildTasks.jsx';
+import ChildPropose from './pages/child/ChildPropose.jsx';
 import TaskComplete from './pages/child/TaskComplete.jsx';
 import RewardClaim from './pages/child/RewardClaim.jsx';
 import Inventory from './pages/child/Inventory.jsx';
@@ -13,6 +14,7 @@ import CreatureDetail from './pages/child/CreatureDetail.jsx';
 
 import ParentDashboard from './pages/parent/ParentDashboard.jsx';
 import ParentVerify from './pages/parent/ParentVerify.jsx';
+import ParentProposals from './pages/parent/ParentProposals.jsx';
 import ParentAddTask from './pages/parent/ParentAddTask.jsx';
 import ParentReport from './pages/parent/ParentReport.jsx';
 import ParentSettings from './pages/parent/ParentSettings.jsx';
@@ -56,6 +58,14 @@ export default function App() {
         }
       />
       <Route
+        path="/child/propose"
+        element={
+          <RequireChild>
+            <ChildPropose />
+          </RequireChild>
+        }
+      />
+      <Route
         path="/child/complete/:taskId"
         element={
           <RequireChild>
@@ -91,6 +101,7 @@ export default function App() {
       {/* 家长端：本地单机版，无需登录 */}
       <Route path="/parent" element={<ParentDashboard />} />
       <Route path="/parent/verify/:taskId" element={<ParentVerify />} />
+      <Route path="/parent/proposals" element={<ParentProposals />} />
       <Route path="/parent/tasks/new" element={<ParentAddTask />} />
       <Route path="/parent/report" element={<ParentReport />} />
       <Route path="/parent/settings" element={<ParentSettings />} />

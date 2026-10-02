@@ -27,14 +27,20 @@ export default function ChildHome() {
 
   const load = useCallback(async () => {
     try {
-      const [s, t, inv] = await Promise.all([api.creatureStatus(), api.childToday(), api.inventory()]);
+      const s = await api.creatureStatus();
+      const [t, inv] = await Promise.all([api.childToday(), api.inventory()]);
       setStatus(s);
       setTasks(t);
       setInventory(inv);
     } catch (err) {
+      // 尚未选择小伙伴 -> 去「选择小伙伴」页
+      if (err.status === 404) {
+        navigate('/child/setup', { replace: true });
+        return;
+      }
       toast(err.message, 'error');
     }
-  }, [toast]);
+  }, [toast, navigate]);
 
   useEffect(() => {
     load();
@@ -86,7 +92,9 @@ export default function ChildHome() {
 
   const creature = status?.creature;
   const meta = creature ? creatureMeta(creature.creature_type) : null;
-  const pendingTasks = tasks?.tasks || [];
+  const allTasks = tasks?.tasks || [];
+  const activeTasks = allTasks.filter(t => t.status !== 'proposed');
+  const proposedTasks = allTasks.filter(t => t.status === 'proposed');
 
   return (
     <PhoneFrame>
@@ -154,10 +162,19 @@ export default function ChildHome() {
               </span>
             </div>
 
-            {pendingTasks.length === 0 ? (
+            <button
+              className="card card--cta"
+              onClick={() => navigate('/child/propose')}
+              style={{ textAlign: 'left', width: '100%', cursor: 'pointer' }}
+            >
+              <span style={{ fontSize: 18 }}>✨</span> 我想领个新任务
+              <span className="muted">（自己提，等爸妈同意）</span>
+            </button>
+
+            {activeTasks.length === 0 ? (
               <Empty icon="🌱" text="今天还没有任务，去提醒爸爸妈妈安排吧" />
             ) : (
-              pendingTasks.map(task => (
+              activeTasks.map(task => (
                 <TaskCard
                   key={task.task_id}
                   task={task}
@@ -165,6 +182,19 @@ export default function ChildHome() {
                   onClaim={t => navigate(`/child/reward/${t.task_id}`)}
                 />
               ))
+            )}
+
+            {proposedTasks.length > 0 && (
+              <>
+                <div className="section-title">💡 我提议的任务（等爸妈同意）</div>
+                {proposedTasks.map(task => (
+                  <TaskCard
+                    key={task.task_id}
+                    task={task}
+                    onOpen={() => toast('等爸爸妈妈同意就能开始做啦~', 'info')}
+                  />
+                ))}
+              </>
             )}
           </>
         )}

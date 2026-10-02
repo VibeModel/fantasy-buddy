@@ -44,6 +44,7 @@ export const STAGE_LABEL = {
 
 export const TASK_STATUS_LABEL = {
   pending: '待开始',
+  proposed: '待爸妈同意',
   awaiting_verification: '待验证',
   verified: '已通过',
   rejected: '未通过'

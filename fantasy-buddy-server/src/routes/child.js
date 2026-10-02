@@ -121,18 +121,72 @@ function getVerifyMode(req) {
 }
 
 /**
+ * 孩子提交自定义任务建议（自己觉得能获得经验的任务）
+ * 提交后进入「待家长审批」状态，家长同意后才成为正式任务
+ * POST /v1/child/tasks
+ */
+router.post('/tasks', (req, res) => {
+  const { name, category, description = '', difficulty = 'easy', rewards = {} } = req.body || {};
+
+  if (!name || !String(name).trim()) return fail(res, 400, 1001, '任务名称不能为空');
+  if (!CHILD_TASK_CATEGORIES.includes(category)) return fail(res, 400, 1001, '任务分类无效');
+
+  const cleanRewards = {};
+  for (const key of CHILD_REWARD_KEYS) {
+    const v = Number(rewards?.[key] || 0);
+    if (v > 0) cleanRewards[key] = Math.min(Math.floor(v), 99);
+  }
+  if (Object.keys(cleanRewards).length === 0) cleanRewards.exp = 10; // 至少给点经验
+
+  const task = Task.create({
+    child_id: req.user.child_id,
+    name: String(name).trim(),
+    description,
+    category,
+    difficulty,
+    rewards: cleanRewards,
+    status: 'proposed',
+    proposed_by: 'child'
+  });
+
+  Notification.create({
+    parent_id: req.user.parent_id,
+    child_id: req.user.child_id,
+    type: 'task_proposed',
+    title: '孩子想领新任务',
+    content: `孩子提议任务「${task.name}」（${CATEGORY_LABEL[category] || category}）`
+  });
+
+  return success(
+    res,
+    {
+      task: {
+        task_id: task.task_id,
+        name: task.name,
+        category: task.category,
+        rewards: task.rewards,
+        status: task.status
+      }
+    },
+    '已经告诉爸爸妈妈啦，等 TA 同意就能做~'
+  );
+});
+
+/**
  * 获取今日任务列表
  * GET /v1/child/tasks/today
  */
 router.get('/tasks/today', (req, res) => {
   const tasks = Task.findTodayByChild(req.user.child_id);
-  const completedCount = tasks.filter(t => t.status !== 'pending').length;
+  const completedCount = tasks.filter(t => t.status !== 'pending' && t.status !== 'proposed').length;
+  const proposedCount = tasks.filter(t => t.status === 'proposed').length;
 
   return success(res, {
     date: todayString(),
     tasks: tasks.map(formatTask),
     completed_count: completedCount,
-    total_count: tasks.length
+    total_count: tasks.length,
+    proposed_count: proposedCount
   });
 });
 

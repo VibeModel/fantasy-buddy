@@ -46,6 +46,7 @@ export function AttrBar({ icon, label, value, tone = 'success' }) {
 
 const STATUS_PILL = {
   pending: { cls: 'pill--info', text: '📌 待开始' },
+  proposed: { cls: 'pill--info', text: '💡 等爸妈同意' },
   awaiting_verification: { cls: 'pill--warning', text: '⏳ 待爸妈验证' },
   verified: { cls: 'pill--success', text: '✅ 已通过' },
   rejected: { cls: 'pill--danger', text: '❌ 未通过' }

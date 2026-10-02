@@ -234,7 +234,8 @@ const Task = {
         exp: data.rewards?.exp || 10,
         ...data.rewards
       },
-      status: 'pending', // pending | completed | awaiting_verification | verified | rejected
+      status: data.status || 'pending', // pending | proposed | completed | awaiting_verification | verified | rejected
+      proposed_by: data.proposed_by || null, // 'child' 表示由孩子发起的提议
       verification: {
         code: null,
         code_expires_at: null,
@@ -257,6 +258,41 @@ const Task = {
    */
   findById(taskId) {
     return db.tasks.get(taskId) || null;
+  },
+
+  /**
+   * 待家长审批的孩子提议
+   */
+  findProposedForParent(parentId) {
+    const parent = Parent.findById(parentId);
+    if (!parent) return [];
+    const proposals = [];
+    for (const task of db.tasks.values()) {
+      if (parent.children_ids.includes(task.child_id) && task.status === 'proposed') {
+        const child = Child.findById(task.child_id);
+        proposals.push({ ...task, child_name: child?.nickname || '未知' });
+      }
+    }
+    return proposals;
+  },
+
+  /**
+   * 家长审批孩子提议
+   * approve: 转为正式任务(pending)，可覆盖奖励
+   * reject: 标记为未通过
+   */
+  decide(taskId, action, rewards) {
+    const task = this.findById(taskId);
+    if (!task || task.status !== 'proposed') return null;
+    if (action === 'approve') {
+      if (rewards) task.rewards = { ...task.rewards, ...rewards };
+      task.status = 'pending';
+    } else {
+      task.status = 'rejected';
+      task.verification.reject_reason = task.verification.reject_reason || '家长未通过该提议';
+    }
+    task.updated_at = Date.now();
+    return task;
   },
 
   /**

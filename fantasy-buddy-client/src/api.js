@@ -90,6 +90,7 @@ export const api = {
 
   // ---------- 儿童端 ----------
   childToday: () => request('GET', '/child/tasks/today', { role: 'child' }),
+  proposeTask: (body) => request('POST', '/child/tasks', { body, role: 'child' }),
   completeTask: (taskId, notes, evidenceUrl) =>
     request('POST', `/child/tasks/${taskId}/complete`, {
       body: { notes, evidence_url: evidenceUrl || null },
@@ -114,6 +115,9 @@ export const api = {
   // ---------- 家长端 ----------
   parentChildren: () => request('GET', '/parent/children', { role: 'parent' }),
   pendingTasks: () => request('GET', '/parent/tasks/pending', { role: 'parent' }),
+  proposals: () => request('GET', '/parent/tasks/proposals', { role: 'parent' }),
+  decideProposal: (taskId, body) =>
+    request('POST', `/parent/tasks/${taskId}/decide`, { body, role: 'parent' }),
   verifyTask: (taskId, body) =>
     request('POST', `/parent/tasks/${taskId}/verify`, { body, role: 'parent' }),
   addTask: (body) => request('POST', '/parent/tasks', { body, role: 'parent' }),

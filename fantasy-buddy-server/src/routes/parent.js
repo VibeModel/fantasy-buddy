@@ -163,6 +163,91 @@ router.get('/tasks/pending', (req, res) => {
 });
 
 /**
+ * 获取孩子提议的任务（待家长审批）
+ * GET /v1/parent/tasks/proposals
+ */
+router.get('/tasks/proposals', (req, res) => {
+  const tasks = Task.findProposedForParent(req.user.id);
+  const formatted = tasks.map(t => ({
+    task_id: t.task_id,
+    child_id: t.child_id,
+    child_name: t.child_name,
+    name: t.name,
+    description: t.description,
+    category: t.category,
+    difficulty: t.difficulty,
+    rewards: t.rewards,
+    proposed_at: new Date(t.created_at).toISOString()
+  }));
+
+  return success(res, { tasks: formatted, total: formatted.length });
+});
+
+/**
+ * 审批孩子提议的任务
+ * POST /v1/parent/tasks/:taskId/decide
+ * action=approve -> 转为正式任务(pending)，可覆盖奖励；reject -> 拒绝
+ */
+router.post('/tasks/:taskId/decide', (req, res) => {
+  const { action, rewards, reject_reason } = req.body || {};
+  if (!['approve', 'reject'].includes(action)) {
+    return fail(res, 400, 1001, 'action 必须为 approve 或 reject');
+  }
+
+  const task = Task.findById(req.params.taskId);
+  if (!task || task.status !== 'proposed') {
+    return fail(res, 404, 1006, '提议不存在或已被处理');
+  }
+
+  const parent = assertOwnChild(req, res, task.child_id);
+  if (!parent) return;
+
+  if (action === 'approve') {
+    const finalRewards = {};
+    for (const key of ['fire_fruit', 'magic_ball', 'bubble_lotion', 'exp']) {
+      const v = Number(rewards?.[key] || 0);
+      if (v > 0) finalRewards[key] = Math.min(Math.floor(v), 99);
+    }
+    Task.decide(task.task_id, 'approve', Object.keys(finalRewards).length ? finalRewards : undefined);
+
+    Notification.create({
+      parent_id: req.user.id,
+      child_id: task.child_id,
+      type: 'proposal_approved',
+      title: '提议通过啦',
+      content: `任务「${task.name}」已被爸爸妈妈同意，去完成它吧~`
+    });
+
+    return success(
+      res,
+      {
+        result: 'approved',
+        task: { task_id: task.task_id, name: task.name, status: 'pending', rewards: task.rewards },
+        message: '已同意，任务已加入孩子今日清单'
+      },
+      '已同意'
+    );
+  }
+
+  Task.decide(task.task_id, 'reject');
+  task.verification.reject_reason = reject_reason || '家长未通过该提议';
+
+  Notification.create({
+    parent_id: req.user.id,
+    child_id: task.child_id,
+    type: 'proposal_rejected',
+    title: '提议未通过',
+    content: `任务「${task.name}」爸妈暂时没同意：${reject_reason || '再努力试试看'}`
+  });
+
+  return success(
+    res,
+    { result: 'rejected', task: { task_id: task.task_id, name: task.name, status: 'rejected' } },
+    '已拒绝该提议'
+  );
+});
+
+/**
  * 验证任务完成（输入验证码）
  * POST /v1/parent/tasks/:taskId/verify
  */

@@ -17,6 +17,7 @@ export default function ParentDashboard() {
 
   const [children, setChildren] = useState(null);
   const [pending, setPending] = useState([]);
+  const [proposals, setProposals] = useState([]);
   const [report, setReport] = useState(null);
   const [nickname, setNickname] = useState('');
   const [newDevice, setNewDevice] = useState('');
@@ -24,9 +25,14 @@ export default function ParentDashboard() {
 
   const load = useCallback(async () => {
     try {
-      const [c, p] = await Promise.all([api.parentChildren(), api.pendingTasks()]);
+      const [c, p, props] = await Promise.all([
+        api.parentChildren(),
+        api.pendingTasks(),
+        api.proposals().catch(() => ({ tasks: [] }))
+      ]);
       setChildren(c.children);
       setPending(p.tasks);
+      setProposals(props.tasks);
       if (c.children[0]) {
         try {
           const r = await api.report(c.children[0].child_id, 'week');
@@ -99,6 +105,18 @@ export default function ParentDashboard() {
           </div>
         ) : (
           <>
+            {proposals.length > 0 && (
+              <div className="card card--cta" onClick={() => navigate('/parent/proposals')} style={{ cursor: 'pointer' }}>
+                <div className="row row--between">
+                  <strong>📝 孩子提议的新任务</strong>
+                  <span className="pill pill--info">{proposals.length} 个待同意</span>
+                </div>
+                <div className="muted mt-8" style={{ fontSize: 13 }}>
+                  孩子自己想领的任务，点这里看看并同意 / 拒绝
+                </div>
+              </div>
+            )}
+
             <div className="section-title">
               📋 待验证任务
               <span className="muted">{pending.length} 个</span>
