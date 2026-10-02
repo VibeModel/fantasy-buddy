@@ -50,7 +50,8 @@ router.post('/auth/child-login', (req, res) => {
     res,
     {
       access_token,
-      child: { child_id: child.child_id, nickname: child.nickname, level: child.level }
+      child: { child_id: child.child_id, nickname: child.nickname, level: child.level },
+      has_creature: !!Creature.findByChild(child.child_id)
     },
     '登录成功'
   );
@@ -77,15 +78,8 @@ router.post('/parent/bind-child', attachLocalParent, (req, res) => {
 
   Parent.bindChild(parentId, child.child_id);
 
-  // 确保孩子拥有一只初始生物
-  let creature = Creature.findByChild(child.child_id);
-  if (!creature) {
-    creature = Creature.create({
-      child_id: child.child_id,
-      name: `${child.nickname}的小伙伴`,
-      creature_type: 'dragon'
-    });
-  }
+  // 小伙伴由孩子在首次登录后自行选择种类并命名，这里不再自动创建
+  const creature = Creature.findByChild(child.child_id);
 
   const childToken = generateToken(child.child_id, 'child', parentId, child.child_id);
 
@@ -95,7 +89,7 @@ router.post('/parent/bind-child', attachLocalParent, (req, res) => {
       child_id: child.child_id,
       nickname: child.nickname,
       device_code: child.device_code,
-      creature_id: creature.creature_id,
+      creature_id: creature ? creature.creature_id : null,
       child_access_token: childToken
     },
     '孩子账号绑定成功'

@@ -20,7 +20,7 @@ export default function ChildLogin() {
     try {
       const data = await api.childLogin(code.trim().toUpperCase());
       loginChild(data.child, data.access_token);
-      navigate('/child', { replace: true });
+      navigate(data.has_creature ? '/child' : '/child/setup', { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {

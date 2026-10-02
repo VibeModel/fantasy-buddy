@@ -49,6 +49,20 @@ const MATERIALS = {
   }
 };
 
+// 可选的小伙伴种类
+const CREATURE_TYPES = ['dragon', 'unicorn', 'turtle', 'butterfly', 'lion'];
+
+// 孩子可提议的任务分类与奖励材料
+const CHILD_TASK_CATEGORIES = ['study', 'sport', 'entertainment', 'housework', 'habit'];
+const CHILD_REWARD_KEYS = ['fire_fruit', 'magic_ball', 'bubble_lotion', 'exp'];
+const CATEGORY_LABEL = {
+  study: '学习',
+  sport: '运动',
+  entertainment: '娱乐',
+  housework: '家务',
+  habit: '习惯'
+};
+
 function success(res, data, message = '操作成功') {
   return res.json({
     success: true,
@@ -94,7 +108,7 @@ function formatTask(task) {
 function getCreatureOrFail(req, res) {
   const creature = Creature.findByChild(req.user.child_id);
   if (!creature) {
-    fail(res, 404, 1006, '未找到你的小伙伴，请先联系爸妈绑定账号');
+    fail(res, 404, 1006, '还没有选择小伙伴，先去选择一只吧');
     return null;
   }
   return creature;
@@ -306,6 +320,47 @@ router.get('/inventory', (req, res) => {
     total_slots: 20,
     used_slots: materials.filter(m => m.quantity > 0).length
   });
+});
+
+/**
+ * 选择小伙伴（种类 + 命名）
+ * POST /v1/child/creature
+ * 每名儿童仅可创建一次
+ */
+router.post('/creature', (req, res) => {
+  const { creature_type, name } = req.body || {};
+
+  if (!CREATURE_TYPES.includes(creature_type)) {
+    return fail(res, 400, 1001, '小伙伴种类无效');
+  }
+
+  const cleanName = String(name || '').trim();
+  if (!cleanName) return fail(res, 400, 1001, '请给小伙伴起个名字');
+  if (cleanName.length > 12) return fail(res, 400, 1001, '名字最多 12 个字');
+
+  if (Creature.findByChild(req.user.child_id)) {
+    return fail(res, 400, 1007, '你已经选过小伙伴啦');
+  }
+
+  const creature = Creature.create({
+    child_id: req.user.child_id,
+    creature_type,
+    name: cleanName
+  });
+
+  return success(
+    res,
+    {
+      creature: {
+        creature_id: creature.creature_id,
+        name: creature.name,
+        creature_type: creature.creature_type,
+        stage: creature.stage,
+        level: creature.level
+      }
+    },
+    '小伙伴诞生啦！'
+  );
 });
 
 /**

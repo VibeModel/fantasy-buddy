@@ -108,6 +108,7 @@ export const api = {
     request('POST', '/child/creature/play', { body: { toy_type }, role: 'child' }),
   bath: (material_type = 'bubble_lotion') =>
     request('POST', '/child/creature/bath', { body: { material_type }, role: 'child' }),
+  createCreature: (body) => request('POST', '/child/creature', { body, role: 'child' }),
   creatureStatus: () => request('GET', '/child/creature/status', { role: 'child' }),
 
   // ---------- 家长端 ----------

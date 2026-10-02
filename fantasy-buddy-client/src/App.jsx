@@ -3,6 +3,7 @@ import { useAuth } from './auth.jsx';
 
 import Landing from './pages/Landing.jsx';
 import ChildLogin from './pages/child/ChildLogin.jsx';
+import ChildSetup from './pages/child/ChildSetup.jsx';
 import ChildHome from './pages/child/ChildHome.jsx';
 import ChildTasks from './pages/child/ChildTasks.jsx';
 import TaskComplete from './pages/child/TaskComplete.jsx';
@@ -30,6 +31,14 @@ export default function App() {
 
       {/* 儿童端：设备码登录 */}
       <Route path="/child/login" element={<ChildLogin />} />
+      <Route
+        path="/child/setup"
+        element={
+          <RequireChild>
+            <ChildSetup />
+          </RequireChild>
+        }
+      />
       <Route
         path="/child"
         element={
