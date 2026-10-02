@@ -49,6 +49,14 @@ llm-play/
 - Node.js ≥ 16（建议 18+）
 - npm
 
+### 0. 一键启动（Windows）
+
+直接双击根目录的 **`start.bat`**（内部调用中文提示的 `start.ps1`）：自动检查 Node.js、首次运行时安装依赖，分别弹出后端与前端窗口，并自动打开浏览器。关闭两个窗口即停止服务。
+
+也可在 PowerShell 中手动运行：`powershell -ExecutionPolicy Bypass -File start.ps1`
+
+以下为手动启动步骤：
+
 ### 1. 启动后端 API 服务
 
 ```bash
