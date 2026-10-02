@@ -40,11 +40,14 @@ body,
 
 body {
   margin: 0;
+  min-height: 100dvh;
   background: #dfe4ee;
   color: var(--c-text);
   font-family: var(--font);
   font-size: 15px;
   line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 button {
@@ -76,9 +79,9 @@ a {
   text-decoration: none;
 }
 
-/* ================= 手机外壳 ================= */
+/* ================= 应用外壳 ================= */
 .phone-wrap {
-  min-height: 100%;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: stretch;
@@ -89,22 +92,55 @@ a {
   position: relative;
   width: 100%;
   max-width: 430px;
-  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--c-bg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-@media (min-width: 480px) {
-  .phone-wrap {
-    padding: 24px 0;
+/* ---------- 大屏手机 / 平板竖屏 ---------- */
+@media (min-width: 600px) {
+  body {
+    font-size: 16px;
+    background: var(--c-bg);
   }
+
   .phone {
-    min-height: calc(100vh - 48px);
-    height: calc(100vh - 48px);
-    border-radius: 28px;
-    box-shadow: 0 24px 60px rgba(60, 70, 100, 0.28);
+    max-width: 720px;
+    height: 100dvh;
+    border-left: 1px solid var(--c-line);
+    border-right: 1px solid var(--c-line);
+  }
+
+  .screen {
+    padding-top: 20px;
+    padding-bottom: calc(28px + env(safe-area-inset-bottom));
+    padding-left: calc(24px + env(safe-area-inset-left));
+    padding-right: calc(24px + env(safe-area-inset-right));
+  }
+
+  .creature-hero__emoji {
+    font-size: 104px;
+  }
+
+  .action-grid {
+    gap: 14px;
+  }
+
+  .material-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .modal {
+    max-width: 420px;
+  }
+}
+
+/* ---------- 平板横屏 / 桌面 ---------- */
+@media (min-width: 1024px) {
+  .phone {
+    max-width: 880px;
   }
 }
 
@@ -112,8 +148,11 @@ a {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
   padding: 16px;
-  padding-bottom: 24px;
+  padding-left: calc(16px + env(safe-area-inset-left));
+  padding-right: calc(16px + env(safe-area-inset-right));
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
   animation: fade-in 0.3s ease;
 }
 
@@ -142,6 +181,9 @@ a {
   align-items: center;
   gap: 10px;
   padding: 14px 16px;
+  padding-top: calc(14px + env(safe-area-inset-top));
+  padding-left: calc(16px + env(safe-area-inset-left));
+  padding-right: calc(16px + env(safe-area-inset-right));
   background: var(--c-card);
   border-bottom: 1px solid var(--c-line);
   position: sticky;
@@ -349,6 +391,7 @@ a {
   background: var(--c-card);
   outline: none;
   transition: border-color 0.15s;
+  font-size: 16px; /* 防止 iOS 聚焦时自动放大 */
 }
 
 .input:focus,
@@ -672,6 +715,8 @@ a {
   align-items: center;
   gap: 8px;
   padding: 32px 24px;
+  padding-top: calc(32px + env(safe-area-inset-top));
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
   background: linear-gradient(180deg, #fff4ee 0%, var(--c-bg) 55%);
 }
 
@@ -762,6 +807,41 @@ a {
     opacity: 1;
     transform: scale(1);
   }
+}
+
+/* ================= 标签 chips ================= */
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  border: 1.5px solid var(--c-line);
+  background: var(--c-bg);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.chip--active {
+  border-color: var(--c-primary);
+  background: var(--c-primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ================= CTA 卡片 ================= */
+.card--cta {
+  border: 1.5px dashed var(--c-primary);
+  background: #fff7f2;
+}
+
+/* ================= 弹层标题 ================= */
+.modal__title {
+  font-size: 17px;
+  font-weight: 800;
+  margin-bottom: 4px;
 }
 
 .toast {
