@@ -149,3 +149,19 @@ export function CodeInput({ value, onChange, length = 6 }) {
     </div>
   );
 }
+
+/** 版本 + 构建时间戳，用于在设备上确认是否已更新到新版本 */
+export function BuildStamp({ className = 'muted' }) {
+  const pad = n => String(n).padStart(2, '0');
+  const version = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '?';
+  const t = typeof __BUILD_TIME__ !== 'undefined' && __BUILD_TIME__ ? new Date(__BUILD_TIME__) : null;
+  const stamp = t
+    ? `${t.getFullYear()}-${pad(t.getMonth() + 1)}-${pad(t.getDate())} ${pad(t.getHours())}:${pad(t.getMinutes())}`
+    : '';
+  return (
+    <div className={className} style={{ fontSize: 12 }}>
+      v{version}
+      {stamp ? ` · 构建于 ${stamp}` : ''}
+    </div>
+  );
+}

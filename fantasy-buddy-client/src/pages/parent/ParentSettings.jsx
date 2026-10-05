@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PhoneFrame, TopBar, BottomNav } from '../../components/Layout.jsx';
-import { Loading, Notice } from '../../components/ui.jsx';
+import { BuildStamp, Loading, Notice } from '../../components/ui.jsx';
 import { useToast } from '../../components/Toast.jsx';
 import { api } from '../../api.js';
 
@@ -216,7 +216,10 @@ export default function ParentSettings() {
 
         <div className="card">
           <strong>ℹ️ 关于</strong>
-          <div className="muted mt-8">奇幻小伙伴 v1.0.0</div>
+          <div className="mt-8">
+            <div className="muted">奇幻小伙伴</div>
+            <BuildStamp />
+          </div>
         </div>
 
         <button className="btn btn--primary btn--block mt-16" disabled={saving} onClick={save}>

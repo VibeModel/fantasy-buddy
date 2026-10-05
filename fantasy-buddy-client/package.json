@@ -1,7 +1,7 @@
 {
   "name": "fantasy-buddy-client",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "《奇幻小伙伴》前端 - 儿童端 + 家长端",
   "type": "module",
   "scripts": {

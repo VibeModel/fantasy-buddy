@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { PhoneFrame } from '../components/Layout.jsx';
+import { BuildStamp } from '../components/ui.jsx';
 import { useAuth } from '../auth.jsx';
 
 export default function Landing() {
@@ -28,6 +29,10 @@ export default function Landing() {
         >
           👨 我是爸爸妈妈
         </button>
+
+        <div className="mt-24">
+          <BuildStamp />
+        </div>
       </div>
     </PhoneFrame>
   );

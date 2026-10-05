@@ -1,11 +1,19 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { readFileSync } from 'node:fs';
+
+// 构建时把 package.json 的版本号与构建时间注入产物，便于在设备上确认是否已更新
+const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf-8'));
 
 // 前端开发服务器：/v1 请求代理到后端 (默认 http://localhost:3000)，仅服务端模式使用
 export default defineConfig({
   // 相对路径产物：兼容 GitHub Pages 等子路径静态托管
   base: './',
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString())
+  },
   plugins: [
     react(),
     VitePWA({
