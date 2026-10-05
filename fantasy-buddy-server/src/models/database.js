@@ -568,11 +568,15 @@ const Creature = {
    */
   checkLevelUp(creature) {
     const newLevel = Math.floor(creature.experience / 100) + 1;
-    
-    // 检查进化阶段
-    if (creature.experience >= 500 && creature.stage === 'baby') {
+
+    // 检查进化阶段：蛋(0) → 幼崽(100) → 成体(500) → 传说(1000)
+    if (creature.stage === 'egg' && creature.experience >= 100) {
+      creature.stage = 'baby';
+    }
+    if (creature.stage === 'baby' && creature.experience >= 500) {
       creature.stage = 'adult';
-    } else if (creature.experience >= 1000 && creature.stage === 'adult') {
+    }
+    if (creature.stage === 'adult' && creature.experience >= 1000) {
       creature.stage = 'legendary';
     }
 

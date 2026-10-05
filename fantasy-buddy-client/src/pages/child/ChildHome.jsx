@@ -4,7 +4,7 @@ import { PhoneFrame, TopBar, BottomNav } from '../../components/Layout.jsx';
 import { AttrBar, LevelBadge, Loading, Empty, TaskCard } from '../../components/ui.jsx';
 import CompleteTaskModal from '../../components/CompleteTaskModal.jsx';
 import { useToast } from '../../components/Toast.jsx';
-import { creatureMeta, materialMeta } from '../../constants/meta.js';
+import { creatureIcon, materialMeta } from '../../constants/meta.js';
 import { api } from '../../api.js';
 import { useAuth } from '../../auth.jsx';
 import { usePolling } from '../../hooks/usePolling.js';
@@ -104,7 +104,7 @@ export default function ChildHome() {
   };
 
   const creature = status?.creature;
-  const meta = creature ? creatureMeta(creature.creature_type) : null;
+  const stage = creature?.stage || 'egg';
   const allTasks = tasks?.tasks || [];
   const activeTasks = allTasks.filter(t => t.status !== 'proposed');
   const proposedTasks = allTasks.filter(t => t.status === 'proposed');
@@ -133,7 +133,9 @@ export default function ChildHome() {
           <>
             <div className="card">
               <div className="creature-hero">
-                <span className="creature-hero__emoji">{meta.icon}</span>
+                <span className={`creature-hero__emoji creature-hero__emoji--${stage}`}>
+                  {creatureIcon(creature.creature_type, stage)}
+                </span>
                 <div className="creature-name">{creature.name}</div>
                 <div className="mt-8">
                   <LevelBadge stage={creature.stage} level={creature.level} />

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { PhoneFrame, TopBar, BottomNav } from '../../components/Layout.jsx';
 import { Loading, Empty } from '../../components/ui.jsx';
 import { useToast } from '../../components/Toast.jsx';
-import { CATEGORY_ORDER, categoryMeta, creatureMeta, STAGE_LABEL } from '../../constants/meta.js';
+import { CATEGORY_ORDER, categoryMeta, creatureIcon, STAGE_LABEL } from '../../constants/meta.js';
 import { api } from '../../api.js';
 
 const WEEKDAY = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
@@ -153,7 +153,7 @@ export default function ParentReport() {
                     <strong>🐾 宠物状态</strong>
                     <div className="row row--between mt-8">
                       <span>
-                        {creatureMeta(creature.creature.type).icon} {creature.creature.name}
+                        {creatureIcon(creature.creature.type, creature.creature.stage)} {creature.creature.name}
                       </span>
                       <span className="badge-level">
                         Lv.{creature.creature.level} {STAGE_LABEL[creature.creature.stage]}

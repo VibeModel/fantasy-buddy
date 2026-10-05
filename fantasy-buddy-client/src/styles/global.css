@@ -124,6 +124,18 @@ a {
     font-size: 104px;
   }
 
+  .creature-hero__emoji--egg {
+    font-size: 92px;
+  }
+
+  .creature-hero__emoji--baby {
+    font-size: 86px;
+  }
+
+  .creature-hero__emoji--legendary {
+    font-size: 114px;
+  }
+
   .action-grid {
     gap: 14px;
   }
@@ -629,6 +641,31 @@ a {
   font-size: 84px;
   display: inline-block;
   animation: breathe 2.6s ease-in-out infinite;
+}
+
+/* 按成长阶段区分视觉：蛋会轻轻摇晃、幼崽更小、传说带金光 */
+.creature-hero__emoji--egg {
+  font-size: 72px;
+  animation: egg-wobble 3s ease-in-out infinite;
+}
+
+.creature-hero__emoji--baby {
+  font-size: 68px;
+}
+
+.creature-hero__emoji--legendary {
+  font-size: 92px;
+  filter: drop-shadow(0 0 14px rgba(255, 196, 0, 0.9));
+}
+
+@keyframes egg-wobble {
+  0%,
+  100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
 }
 
 @keyframes breathe {

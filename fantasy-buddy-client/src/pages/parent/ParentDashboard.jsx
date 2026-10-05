@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { PhoneFrame, TopBar, BottomNav } from '../../components/Layout.jsx';
 import { Loading, Empty, Notice } from '../../components/ui.jsx';
 import { useToast } from '../../components/Toast.jsx';
-import { creatureMeta, STAGE_LABEL } from '../../constants/meta.js';
+import { creatureIcon, STAGE_LABEL } from '../../constants/meta.js';
 import { api } from '../../api.js';
 import { usePolling } from '../../hooks/usePolling.js';
 
@@ -186,7 +186,7 @@ export default function ParentDashboard() {
                 <div className="card">
                   <div className="row row--between">
                     <strong>
-                      {creatureMeta(first.creature.creature_type).icon} {first.creature.name}
+                      {creatureIcon(first.creature.creature_type, first.creature.stage)} {first.creature.name}
                     </strong>
                     <span className="badge-level">
                       Lv.{first.creature.level} {STAGE_LABEL[first.creature.stage]}

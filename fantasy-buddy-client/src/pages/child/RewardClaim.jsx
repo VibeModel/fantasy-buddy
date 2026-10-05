@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PhoneFrame, TopBar } from '../../components/Layout.jsx';
 import { Loading, Notice } from '../../components/ui.jsx';
-import { creatureMeta, rewardEntries } from '../../constants/meta.js';
+import { creatureIcon, creatureMeta, rewardEntries } from '../../constants/meta.js';
 import { api } from '../../api.js';
 
 export default function RewardClaim() {
@@ -13,6 +13,7 @@ export default function RewardClaim() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [creatureType, setCreatureType] = useState('dragon');
+  const [creatureStage, setCreatureStage] = useState('egg');
 
   useEffect(() => {
     if (claimedRef.current) return;
@@ -30,6 +31,7 @@ export default function RewardClaim() {
       try {
         const s = await api.creatureStatus();
         setCreatureType(s.creature.creature_type);
+        setCreatureStage(s.creature.stage || 'egg');
       } catch {
         /* ignore */
       }
@@ -61,7 +63,7 @@ export default function RewardClaim() {
     );
   }
 
-  const meta = creatureMeta(creatureType);
+  const icon = creatureIcon(creatureType, creatureStage);
   const rewards = rewardEntries(result.rewards_claimed);
 
   return (
@@ -70,9 +72,9 @@ export default function RewardClaim() {
         <div className="center mt-16 reward-pop">
           <div style={{ fontSize: 32, fontWeight: 800 }}>🎊 验证通过！🎊</div>
           <div className="creature-hero">
-            <span className="creature-hero__emoji">{meta.icon}</span>
+            <span className={`creature-hero__emoji creature-hero__emoji--${creatureStage}`}>{icon}</span>
           </div>
-          <div className="creature-name">{result.creature?.name || meta.name}</div>
+          <div className="creature-name">{result.creature?.name || creatureMeta(creatureType).name}</div>
           <div className="muted mt-8">{result.message}</div>
         </div>
 

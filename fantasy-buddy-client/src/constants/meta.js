@@ -35,6 +35,18 @@ export const CREATURE_META = {
   lion: { name: '火焰狮', icon: '🦁' }
 };
 
+/**
+ * 各物种在不同成长阶段的形象（emoji）。
+ * egg 阶段所有物种共用蛋；baby / adult / legendary 按物种区分。
+ */
+export const CREATURE_STAGE_ICON = {
+  dragon: { egg: '🥚', baby: '🦎', adult: '🐉', legendary: '🐲' },
+  unicorn: { egg: '🥚', baby: '🐴', adult: '🦄', legendary: '🦄' },
+  turtle: { egg: '🥚', baby: '🐢', adult: '🐢', legendary: '🐢' },
+  butterfly: { egg: '🥚', baby: '🐛', adult: '🦋', legendary: '🦋' },
+  lion: { egg: '🥚', baby: '🐱', adult: '🦁', legendary: '🦁' }
+};
+
 export const STAGE_LABEL = {
   egg: '蛋',
   baby: '幼崽',
@@ -60,6 +72,11 @@ export function categoryMeta(category) {
 
 export function creatureMeta(type) {
   return CREATURE_META[type] || { name: '小伙伴', icon: '🐾' };
+}
+
+/** 按物种 + 成长阶段取形象；阶段缺省时回退到成体形象 */
+export function creatureIcon(type, stage) {
+  return CREATURE_STAGE_ICON[type]?.[stage] || creatureMeta(type).icon;
 }
 
 export function rewardEntries(rewards = {}) {

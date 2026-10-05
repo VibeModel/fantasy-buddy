@@ -428,12 +428,16 @@ export const Creature = {
     return creature;
   },
 
-  /** 保持后端原行为：egg → baby 不在此触发 */
+  /** 经验达到阈值时推进成长阶段：蛋(0) → 幼崽(100) → 成体(500) → 传说(1000) */
   checkLevelUp(creature) {
     const newLevel = Math.floor(creature.experience / 100) + 1;
-    if (creature.experience >= 500 && creature.stage === 'baby') {
+    if (creature.stage === 'egg' && creature.experience >= 100) {
+      creature.stage = 'baby';
+    }
+    if (creature.stage === 'baby' && creature.experience >= 500) {
       creature.stage = 'adult';
-    } else if (creature.experience >= 1000 && creature.stage === 'adult') {
+    }
+    if (creature.stage === 'adult' && creature.experience >= 1000) {
       creature.stage = 'legendary';
     }
     if (newLevel > creature.level) creature.level = newLevel;

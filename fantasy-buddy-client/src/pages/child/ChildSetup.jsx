@@ -37,6 +37,7 @@ export default function ChildSetup() {
       <TopBar title="选择你的小伙伴" />
       <div className="screen">
         <div className="center muted">挑一只喜欢的，再给它起个名字吧~</div>
+        <div className="center muted" style={{ fontSize: 13 }}>🥚 每个小伙伴都会从一颗蛋开始孵化哦</div>
 
         <div className="creature-hero">
           <span className="creature-hero__emoji">{meta.icon}</span>

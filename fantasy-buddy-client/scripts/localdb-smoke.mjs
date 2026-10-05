@@ -17,6 +17,7 @@ globalThis.localStorage = {
 
 const { localApi } = await import('../src/localdb/localApi.js');
 const { session } = await import('../src/session.js');
+const { Creature } = await import('../src/localdb/models.js');
 
 let pass = 0;
 let failCount = 0;
@@ -167,6 +168,20 @@ ok(fed.exp_gained === 10, '喂食经验 +10');
 const status = await localApi.creatureStatus();
 ok(status.status.intimacy >= 5, '亲密度已增长');
 ok(status.creature.creature_type === 'dragon', 'status 字段为 creature_type');
+
+console.log('\n# 成长阶段进化（蛋→幼崽→成体→传说）');
+const stageAfter = (experience, stage) => {
+  const c = { experience, stage, level: 1 };
+  Creature.checkLevelUp(c);
+  return c.stage;
+};
+ok(stageAfter(0, 'egg') === 'egg', '0 经验仍是蛋');
+ok(stageAfter(99, 'egg') === 'egg', '99 经验仍是蛋');
+ok(stageAfter(100, 'egg') === 'baby', '100 经验孵化成幼崽');
+ok(stageAfter(499, 'baby') === 'baby', '499 经验仍是幼崽');
+ok(stageAfter(500, 'baby') === 'adult', '500 经验长成成体');
+ok(stageAfter(1000, 'adult') === 'legendary', '1000 经验进化为传说');
+ok(stageAfter(1000, 'egg') === 'legendary', '经验大跳跃时连升多阶');
 
 console.log('\n# 孩子提议任务');
 await expectThrow(

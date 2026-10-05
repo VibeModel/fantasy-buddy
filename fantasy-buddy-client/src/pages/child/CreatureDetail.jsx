@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { PhoneFrame, TopBar, BottomNav } from '../../components/Layout.jsx';
 import { AttrBar, LevelBadge, Loading } from '../../components/ui.jsx';
 import { useToast } from '../../components/Toast.jsx';
-import { creatureMeta, materialMeta } from '../../constants/meta.js';
+import { creatureIcon, materialMeta } from '../../constants/meta.js';
 import { api } from '../../api.js';
 
 const CHAT = ['咕噜咕噜~ 今天也要开心哦！', '陪你一起加油！', '你好棒，我最喜欢你啦~', '摸摸头，好舒服~'];
@@ -60,7 +60,8 @@ export default function CreatureDetail() {
   }
 
   const { creature, status: attr } = status;
-  const meta = creatureMeta(creature.creature_type);
+  const stage = creature.stage || 'egg';
+  const icon = creatureIcon(creature.creature_type, stage);
 
   const tiles = [
     { action: 'feed', icon: '🍚', label: '喂食', mat: 'fire_fruit' },
@@ -70,11 +71,11 @@ export default function CreatureDetail() {
 
   return (
     <PhoneFrame>
-      <TopBar title={`${meta.icon} ${creature.name}`} onBack="/child" />
+      <TopBar title={`${icon} ${creature.name}`} onBack="/child" />
       <div className="screen screen--with-nav">
         <div className="card">
           <div className="creature-hero">
-            <span className="creature-hero__emoji">{meta.icon}</span>
+            <span className={`creature-hero__emoji creature-hero__emoji--${stage}`}>{icon}</span>
             <div className="creature-name">{creature.name}</div>
             <div className="mt-8">
               <LevelBadge stage={creature.stage} level={creature.level} />
