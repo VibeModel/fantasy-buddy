@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFB07C" />
+      <stop offset="1" stop-color="#FF6F61" />
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="116" fill="url(#bg)" />
+
+  <!-- 犄角 -->
+  <path d="M168 176 L138 112 L214 150 Z" fill="#FFF6EC" />
+  <path d="M344 176 L374 112 L298 150 Z" fill="#FFF6EC" />
+
+  <!-- 头部 -->
+  <circle cx="256" cy="280" r="118" fill="#FFF6EC" />
+
+  <!-- 眼睛 -->
+  <circle cx="214" cy="268" r="17" fill="#4A2C20" />
+  <circle cx="298" cy="268" r="17" fill="#4A2C20" />
+  <circle cx="219" cy="262" r="6" fill="#FFFFFF" />
+  <circle cx="303" cy="262" r="6" fill="#FFFFFF" />
+
+  <!-- 腮红 -->
+  <circle cx="184" cy="306" r="14" fill="#FFC2B4" />
+  <circle cx="328" cy="306" r="14" fill="#FFC2B4" />
+
+  <!-- 微笑 -->
+  <path d="M228 322 q28 24 56 0" stroke="#4A2C20" stroke-width="12" fill="none" stroke-linecap="round" />
+</svg>

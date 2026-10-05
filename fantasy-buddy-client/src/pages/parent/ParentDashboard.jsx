@@ -20,20 +20,23 @@ export default function ParentDashboard() {
   const [pending, setPending] = useState([]);
   const [proposals, setProposals] = useState([]);
   const [report, setReport] = useState(null);
+  const [hasPin, setHasPin] = useState(true);
   const [nickname, setNickname] = useState('');
   const [newDevice, setNewDevice] = useState('');
   const [adding, setAdding] = useState(false);
 
   const load = useCallback(async () => {
     try {
-      const [c, p, props] = await Promise.all([
+      const [c, p, props, settings] = await Promise.all([
         api.parentChildren(),
         api.pendingTasks(),
-        api.proposals().catch(() => ({ tasks: [] }))
+        api.proposals().catch(() => ({ tasks: [] })),
+        api.getSettings().catch(() => null)
       ]);
       setChildren(c.children);
       setPending(p.tasks);
       setProposals(props.tasks);
+      if (settings) setHasPin(!!settings.has_approval_pin);
       if (c.children[0]) {
         try {
           const r = await api.report(c.children[0].child_id, 'week');
@@ -122,6 +125,14 @@ export default function ParentDashboard() {
           </div>
         ) : (
           <>
+            {!hasPin && (
+              <div className="card card--cta" onClick={() => navigate('/parent/settings')} style={{ cursor: 'pointer' }}>
+                <Notice type="warn">
+                  尚未设置家长 PIN，孩子可随意进入家长端。建议立即设置 →
+                </Notice>
+              </div>
+            )}
+
             {proposals.length > 0 && (
               <div className="card card--cta" onClick={() => navigate('/parent/proposals')} style={{ cursor: 'pointer' }}>
                 <div className="row row--between">

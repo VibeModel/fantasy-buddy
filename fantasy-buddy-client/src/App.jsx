@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useAuth } from './auth.jsx';
+import { RequireParent } from './parentGate.jsx';
 
 import Landing from './pages/Landing.jsx';
 import ChildLogin from './pages/child/ChildLogin.jsx';
@@ -18,6 +19,7 @@ import ParentProposals from './pages/parent/ParentProposals.jsx';
 import ParentAddTask from './pages/parent/ParentAddTask.jsx';
 import ParentReport from './pages/parent/ParentReport.jsx';
 import ParentSettings from './pages/parent/ParentSettings.jsx';
+import ParentUnlock from './pages/parent/ParentUnlock.jsx';
 
 function RequireChild({ children }) {
   const { child } = useAuth();
@@ -98,13 +100,56 @@ export default function App() {
         }
       />
 
-      {/* 家长端：本地单机版，无需登录 */}
-      <Route path="/parent" element={<ParentDashboard />} />
-      <Route path="/parent/verify/:taskId" element={<ParentVerify />} />
-      <Route path="/parent/proposals" element={<ParentProposals />} />
-      <Route path="/parent/tasks/new" element={<ParentAddTask />} />
-      <Route path="/parent/report" element={<ParentReport />} />
-      <Route path="/parent/settings" element={<ParentSettings />} />
+      {/* 家长端：本地单机版，无需登录，但需通过家长 PIN 门禁 */}
+      <Route path="/parent/unlock" element={<ParentUnlock />} />
+      <Route
+        path="/parent"
+        element={
+          <RequireParent>
+            <ParentDashboard />
+          </RequireParent>
+        }
+      />
+      <Route
+        path="/parent/verify/:taskId"
+        element={
+          <RequireParent>
+            <ParentVerify />
+          </RequireParent>
+        }
+      />
+      <Route
+        path="/parent/proposals"
+        element={
+          <RequireParent>
+            <ParentProposals />
+          </RequireParent>
+        }
+      />
+      <Route
+        path="/parent/tasks/new"
+        element={
+          <RequireParent>
+            <ParentAddTask />
+          </RequireParent>
+        }
+      />
+      <Route
+        path="/parent/report"
+        element={
+          <RequireParent>
+            <ParentReport />
+          </RequireParent>
+        }
+      />
+      <Route
+        path="/parent/settings"
+        element={
+          <RequireParent>
+            <ParentSettings />
+          </RequireParent>
+        }
+      />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

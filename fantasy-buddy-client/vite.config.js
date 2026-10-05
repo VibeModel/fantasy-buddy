@@ -1,9 +1,47 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { VitePWA } from 'vite-plugin-pwa';
 
-// 前端开发服务器：/v1 请求代理到后端 (默认 http://localhost:3000)
+// 前端开发服务器：/v1 请求代理到后端 (默认 http://localhost:3000)，仅服务端模式使用
 export default defineConfig({
-  plugins: [react()],
+  // 相对路径产物：兼容 GitHub Pages 等子路径静态托管
+  base: './',
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.svg', 'favicon.ico', 'apple-touch-icon-180x180.png', 'logo.svg'],
+      manifest: {
+        name: '奇幻小伙伴',
+        short_name: '奇幻小伙伴',
+        description: '做任务 · 养宠物 · 一起成长',
+        lang: 'zh-CN',
+        start_url: './',
+        scope: './',
+        display: 'standalone',
+        orientation: 'portrait',
+        background_color: '#FFF7F2',
+        theme_color: '#FF8A65',
+        icons: [
+          { src: 'pwa-64x64.png', sizes: '64x64', type: 'image/png' },
+          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+          {
+            src: 'maskable-icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable'
+          }
+        ]
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
+        navigateFallback: 'index.html',
+        cleanupOutdatedCaches: true
+      },
+      devOptions: { enabled: false }
+    })
+  ],
   server: {
     host: true, // 监听 0.0.0.0，允许平板/手机通过局域网 IP 访问
     port: 5173,

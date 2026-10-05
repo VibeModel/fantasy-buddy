@@ -6,16 +6,24 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:server": "vite --mode server",
     "build": "vite build",
-    "preview": "vite preview"
+    "build:server": "vite build --mode server",
+    "preview": "vite preview",
+    "gen:icons": "pwa-assets-generator",
+    "test:localdb": "node scripts/localdb-smoke.mjs"
   },
   "dependencies": {
+    "@noble/hashes": "^2.4.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.2"
   },
   "devDependencies": {
+    "@vite-pwa/assets-generator": "^2.0.0",
     "@vitejs/plugin-react": "^4.3.2",
-    "vite": "^5.4.8"
+    "fake-indexeddb": "^6.2.5",
+    "vite": "^5.4.8",
+    "vite-plugin-pwa": "^2.0.0"
   }
 }

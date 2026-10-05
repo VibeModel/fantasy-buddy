@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useParentGate } from '../parentGate.jsx';
 
 export function PhoneFrame({ children }) {
   return (
@@ -43,6 +44,7 @@ const PARENT_NAV = [
 export function BottomNav({ role }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { lock } = useParentGate();
   const items = role === 'parent' ? PARENT_NAV : CHILD_NAV;
 
   return (
@@ -60,6 +62,12 @@ export function BottomNav({ role }) {
           </button>
         );
       })}
+      {role === 'parent' && (
+        <button className="bottom-nav__item" onClick={lock} title="锁定家长端">
+          <span className="icon">🔒</span>
+          <span>锁定</span>
+        </button>
+      )}
     </nav>
   );
 }
