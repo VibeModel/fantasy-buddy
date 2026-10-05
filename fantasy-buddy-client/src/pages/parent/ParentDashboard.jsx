@@ -5,6 +5,7 @@ import { Loading, Empty, Notice } from '../../components/ui.jsx';
 import { useToast } from '../../components/Toast.jsx';
 import { creatureMeta, STAGE_LABEL } from '../../constants/meta.js';
 import { api } from '../../api.js';
+import { usePolling } from '../../hooks/usePolling.js';
 
 function hhmm(iso) {
   const d = new Date(iso);
@@ -49,6 +50,22 @@ export default function ParentDashboard() {
   useEffect(() => {
     load();
   }, [load]);
+
+  // 每 5 秒静默刷新待验证/提议列表，孩子提交后家长端自动出现
+  const refreshLists = useCallback(async () => {
+    try {
+      const [p, props] = await Promise.all([
+        api.pendingTasks(),
+        api.proposals().catch(() => ({ tasks: [] }))
+      ]);
+      setPending(p.tasks);
+      setProposals(props.tasks);
+    } catch {
+      /* 静默 */
+    }
+  }, []);
+
+  usePolling(refreshLists, 5000);
 
   const addChild = async () => {
     if (!nickname.trim()) return;

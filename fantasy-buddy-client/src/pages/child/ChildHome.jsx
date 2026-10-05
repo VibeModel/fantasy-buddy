@@ -7,6 +7,7 @@ import { useToast } from '../../components/Toast.jsx';
 import { creatureMeta, materialMeta } from '../../constants/meta.js';
 import { api } from '../../api.js';
 import { useAuth } from '../../auth.jsx';
+import { usePolling } from '../../hooks/usePolling.js';
 
 function todayLabel() {
   const d = new Date();
@@ -45,6 +46,18 @@ export default function ChildHome() {
   useEffect(() => {
     load();
   }, [load]);
+
+  // 每 5 秒静默刷新今日任务，家长验证通过后自动显示「领奖励」
+  const refreshTasks = useCallback(async () => {
+    try {
+      const t = await api.childToday();
+      setTasks(t);
+    } catch {
+      /* 静默 */
+    }
+  }, []);
+
+  usePolling(refreshTasks, 5000);
 
   const materialCount = type =>
     inventory?.materials?.find(m => m.material_type === type)?.quantity || 0;
