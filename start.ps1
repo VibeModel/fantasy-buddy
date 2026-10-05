@@ -2,15 +2,26 @@
 # 奇幻小伙伴 (Fantasy Buddy) 一键启动脚本
 # 由 start.bat 调用，也可手动运行：
 #   powershell -ExecutionPolicy Bypass -File start.ps1
+#   powershell -ExecutionPolicy Bypass -File start.ps1 -Server   # 服务端模式
+#
+# 默认「本地模式」：纯前端 + 浏览器本地数据（IndexedDB），无需后端。
+# -Server：额外启动后端，前端走 /v1 HTTP（开发/兼容用途）。
 # ============================================
+
+param(
+    [switch]$Server
+)
 
 $Root = $PSScriptRoot
 $serverDir = Join-Path $Root 'fantasy-buddy-server'
 $clientDir = Join-Path $Root 'fantasy-buddy-client'
 
+$modeText = if ($Server) { '服务端模式 (server)' } else { '本地模式 (local · 无需后端)' }
+
 Write-Host ''
 Write-Host '==========================================' -ForegroundColor Cyan
 Write-Host '   奇幻小伙伴 (Fantasy Buddy) 一键启动' -ForegroundColor Cyan
+Write-Host "   运行模式：$modeText" -ForegroundColor Cyan
 Write-Host '==========================================' -ForegroundColor Cyan
 Write-Host ''
 
@@ -22,8 +33,8 @@ if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
 }
 
 # 2. 首次运行：安装依赖
-if (-not (Test-Path (Join-Path $serverDir 'node_modules'))) {
-    Write-Host '[1/3] 首次运行，安装后端依赖（约 1 分钟）...' -ForegroundColor Yellow
+if ($Server -and -not (Test-Path (Join-Path $serverDir 'node_modules'))) {
+    Write-Host '首次运行，安装后端依赖（约 1 分钟）...' -ForegroundColor Yellow
     Push-Location $serverDir
     npm install
     Pop-Location
@@ -36,7 +47,7 @@ if (-not (Test-Path (Join-Path $serverDir 'node_modules'))) {
 }
 
 if (-not (Test-Path (Join-Path $clientDir 'node_modules'))) {
-    Write-Host '[2/3] 首次运行，安装前端依赖（约 1 分钟）...' -ForegroundColor Yellow
+    Write-Host '首次运行，安装前端依赖（约 1 分钟）...' -ForegroundColor Yellow
     Push-Location $clientDir
     npm install
     Pop-Location
@@ -49,25 +60,33 @@ if (-not (Test-Path (Join-Path $clientDir 'node_modules'))) {
 }
 
 # 3. 启动服务（独立窗口，日志可见，关窗即停）
-Write-Host '[3/3] 启动服务...' -ForegroundColor Yellow
-
-Start-Process cmd -ArgumentList "/k title 奇幻小伙伴-后端:3000 && cd /d `"$serverDir`" && npm start"
-
-Start-Sleep -Seconds 3
-
-Start-Process cmd -ArgumentList "/k title 奇幻小伙伴-前端:5173 && cd /d `"$clientDir`" && npm run dev"
+if ($Server) {
+    Write-Host '启动后端与前端...' -ForegroundColor Yellow
+    Start-Process cmd -ArgumentList "/k title 奇幻小伙伴-后端:3000 && cd /d `"$serverDir`" && npm start"
+    Start-Sleep -Seconds 3
+    Start-Process cmd -ArgumentList "/k title 奇幻小伙伴-前端:5173 && cd /d `"$clientDir`" && npm run dev:server"
+} else {
+    Write-Host '启动前端...' -ForegroundColor Yellow
+    Start-Process cmd -ArgumentList "/k title 奇幻小伙伴-前端:5173 && cd /d `"$clientDir`" && npm run dev"
+}
 
 Start-Sleep -Seconds 4
-
 Start-Process 'http://localhost:5173'
 
 Write-Host ''
 Write-Host '启动完成！' -ForegroundColor Green
-Write-Host '  后端 API: http://localhost:3000（健康检查 /health）'
+if ($Server) {
+    Write-Host '  后端 API: http://localhost:3000（健康检查 /health）'
+}
 Write-Host '  前端页面: http://localhost:5173'
-Write-Host '    家长端: http://localhost:5173/parent'
-Write-Host '    儿童端: http://localhost:5173/child/login'
+Write-Host '    家长端: http://localhost:5173/#/parent（需输入家长 PIN）'
+Write-Host '    儿童端: http://localhost:5173/#/child/login'
 Write-Host ''
-Write-Host '停止服务：关闭对应的两个命令行窗口即可。'
+if ($Server) {
+    Write-Host '停止服务：关闭两个命令行窗口即可。'
+} else {
+    Write-Host '本地模式：数据保存在浏览器本地（IndexedDB）；平板可通过“添加到主屏幕”安装为 PWA。'
+    Write-Host '停止服务：关闭前端命令行窗口即可。'
+}
 Write-Host ''
 Read-Host '按回车键关闭本窗口'
